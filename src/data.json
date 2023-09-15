@@ -1,0 +1,62 @@
+{
+  "name": "Quiz",
+  "startTitle": "Heyho",
+  "blocks": [
+    {
+      "startTitle": "Erster Block",
+      "questions": [
+        {
+          "title": "Was ist los?",
+          "renderer": "guess",
+          "answers": [
+            {
+              "text": "100"
+            }
+          ]
+        },
+        {
+          "title": "Was ist jetzt los?",
+          "renderer": "base",
+          "answers": [
+            {
+              "text": "Nichts"
+            },
+            {
+              "text": "Alles",
+              "correct": true
+            },
+            {
+              "text": "Fast nichts"
+            },
+            {
+              "text": "Fast alles"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "title": "Was ist los?",
+          "renderer": "base",
+          "answers": [
+            {
+              "text": "Nichts"
+            },
+            {
+              "text": "Alles",
+              "correct": true
+            },
+            {
+              "text": "Fast nichts"
+            },
+            {
+              "text": "Fast alles"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
