@@ -1,0 +1,5 @@
+recursive-include src/kneipenquiz3000/frontend *
+include pyproject.toml
+include README.md
+include LICENSE.txt
+include setup.cfg
