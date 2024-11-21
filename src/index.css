@@ -199,3 +199,39 @@ video {
   margin-top: auto;
   margin-bottom: auto;
 }
+
+.Emotion {
+  font-size:25px;
+}
+
+.Emotion--current{
+  font-size: 50px;
+}
+
+.Candidate .Answers .Answer--selected{
+  background-color:yellow;
+}
+
+.Candidate .Answers .Answer--wrong{
+  background-color:red!important;
+}
+
+.Candidate .Answers input{
+  display:block;
+  font-size:var(--font-size-medium);
+  width:100%;
+  height:100%;
+}
+
+.Candidate .Question.Guess .Answers .Answer{
+  text-align: center;
+}
+
+ @media only screen and (max-width: 600px) {
+   .Start{
+     font-size:30px;
+   }
+   .Candidate .Question .Title{
+     font-size: 23px;
+   }
+}
