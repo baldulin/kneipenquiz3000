@@ -1,0 +1,59 @@
+{
+  "name": "Schreiner Kneipenquiz",
+  "startTitle": "Heyho",
+  "blocks": [
+    {
+      "startTitle": "Erster Block",
+      "questions": [
+        {
+          "title": "Was ist los?",
+          "renderer": "guess",
+          "answers": [
+            {
+              "text": "100"
+            }
+          ]
+        },
+        {
+          "title": "Was ist jetzt los?",
+          "renderer": "base",
+          "answers": [
+            {
+              "text": "Nichts"
+            },
+            {
+              "text": "Alles",
+              "correct": true
+            },
+            {
+              "text": "Fast nichts"
+            },
+            {
+              "text": "Fast alles"
+            }
+          ]
+        },
+        {
+          "title": "\"Niemand hat die Absicht eine Mauer zu errichten?\"",
+          "renderer": "base",
+          "answers": [
+            { "text": "Erich Honnecker", "letter": "A" },
+            { "text": "Walter Ulbricht", "letter": "B", "correct": true },
+            { "text": "Friedrich Ebert jr.", "letter": "C" },
+            { "text": "Willi Stoph", "letter": "D" }
+          ]
+        },
+        {
+          "title": "\"Im deutschen Fernsehen gibt es nur noch kaputte Familien. Außer den Simpsons gibt es keine normale Familie mehr im TV.\"",
+          "renderer": "base",
+          "answers": [
+            { "text": "Marie-Agnes Strack-Zimmermann", "letter": "A" },
+            { "text": "Angela Merkel", "letter": "B" },
+            { "text": "Gregor Gysi", "letter": "C" },
+            { "text": "Edmund Stoiber", "letter": "D", "correct": true }
+          ]
+        }
+      ]
+    }
+  ]
+}
