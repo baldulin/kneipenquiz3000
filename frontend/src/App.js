@@ -6,12 +6,8 @@ export const App = () => {
   //const [seat, setSeat] = useState(null);
   const hash = window.location.hash;
   const seat = hash ? hash.substring(1) : "team";
-  const setSeat = null;
 
-  if(seat === null){
-    return <LobbySeat setSeat={setSeat}/>
-  }
-  else if(seat === "gamemaster"){
+  if(seat === "gamemaster"){
     return <GameMasterSeat/>;
   }
   else if(seat === "team"){
@@ -21,7 +17,7 @@ export const App = () => {
     return <ScreenSeat/>
   }
   else{
-    throw Error(`Seat "${seat} is not known`);
+    throw Error(`Seat "${seat}" is not known`);
   }
 }
 
