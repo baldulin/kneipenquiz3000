@@ -32,7 +32,8 @@ code {
   --padding-small: 1px;
   --margin-main: 20px;
   --margin-medium: 10px;
-  --margin-small: 1px;
+  --margin-small: 5px;
+  --margin-tiny: 1px;
 }
 
 button {
@@ -41,7 +42,7 @@ button {
   border-color: black;
   border-style: solid;
   border-width: 1px;
-  margin: var(--margin-small);
+  margin: var(--margin-tiny);
   font-size: var(--font-size-small);
 }
 
@@ -234,4 +235,32 @@ video {
    .Candidate .Question .Title{
      font-size: 23px;
    }
+}
+.Login {
+ height:300px;
+ max-width:300px;
+}
+
+.Login .Wrapper{
+ background-color:#F5F5F5;
+ padding:20px;
+ border:1px solid grey;
+ font-size:var(--font-size-medium);
+}
+
+.Login input{
+ width:100%;
+ font-size:var(--font-size-medium);
+}
+.Login .Wrapper .Password{
+ margin-bottom:var(--margin-main);
+}
+
+.Login .Wrapper .Title{
+  margin-bottom:var(--margin-small);
+}
+
+.Login > .Title{
+ font-size:var(--font-size-main);
+ margin-bottom:var(--margin-medium);
 }

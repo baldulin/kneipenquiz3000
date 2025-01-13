@@ -133,11 +133,14 @@ export const TeamSeat = () => {
 
   if(!state){
     return <div className="App Login">
-      <div className="Title">Team Name</div>
+      <div className="Title">Kneipenquiz</div>
+      <div className="Wrapper">
+     <div className="Title">Team Name:</div>
       <div className="Password">
         <input type="text" value={preName} onChange={(ev) => setPreName(ev.target.value)}/>
       </div>
       <input type="button" onClick={() => setName(preName)} value="Start!"/>
+      </div>
     </div>
   }
 
