@@ -4,11 +4,13 @@ import {hostName} from "./config";
 const localStorageKey = "quizKey";
 
 export const useLocalStorage = (initialState) => {
-  const [state, setStateInner] = useState(initialState);
+  const [state, setStateInner] = useState(() => initialState ?? JSON.parse(window.localStorage.getItem(localStorageKey)));
 
   useEffect(() => {
-    const json = JSON.stringify(initialState);
-    window.localStorage.setItem(localStorageKey, json);
+    if(initialState){
+      const json = JSON.stringify(initialState);
+      window.localStorage.setItem(localStorageKey, json);
+    }
 
     const listener = (event) => {
       console.log("Got event", event);
@@ -94,8 +96,9 @@ export const useScreen = () => {
 
 
 export const useTeam = (gameName, name) => {
-  const [teamToken, setTeamToken] = useState(null);
   const [teamData, setTeamData] = useState(null);
+  const [localStorage, setLocalStorage] = useLocalStorage();
+  const teamToken = localStorage?.teamToken;
 
   useEffect(() => {
     if(name?.length > 0){
@@ -104,7 +107,7 @@ export const useTeam = (gameName, name) => {
         body: JSON.stringify({"name": name}),
       }).then((response) => response.json()).then(
         (data) => {
-          setTeamToken(data);
+          setLocalStorage({"teamToken": data});
         }
       );
     }
