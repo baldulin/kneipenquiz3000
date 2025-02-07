@@ -249,6 +249,8 @@ export const BaseTeamRenderer = ({gameMasterData, actions}) => {
   const blockLength = gameMasterData.questions.blocks.length
   const questionIndex = gameMasterData.current_question_index?.[1] ? gameMasterData.current_question_index[1]: 0;
   const questionLength = gameMasterData.questions.blocks?.[blockIndex]?.questions?.length
+  const hasNextQuestion = !(blockIndex + 1 >= blockLength && questionIndex + 1 >= questionLength);
+
   // TODO this is awkward
   let correctAnswer = gameMasterData.question_data?.answers?.find((answer) => answer.correct)?.text;
   if(gameMasterData.question_data?.answers?.length === 1){
@@ -266,10 +268,10 @@ export const BaseTeamRenderer = ({gameMasterData, actions}) => {
       <div className="Title">
         <span className="Title">State</span>
         <span className="Title">
-          Block {blockIndex}/{blockLength}
+          Block {blockIndex + 1}/{blockLength}
         </span>
         <span className="Title">
-          Question {questionIndex}/{questionLength}
+          Question {questionIndex + 1}/{questionLength}
         </span>
         {isScoring &&
           <button type="button" className="Button Button--answer" onClick={() => actions.show_answer(scores)}>
@@ -284,7 +286,7 @@ export const BaseTeamRenderer = ({gameMasterData, actions}) => {
               Score
             </button>
         }
-        {!isScoring && (gameMasterData.question_state === "ANSWER" || !gameMasterData.question_state) &&
+        {!isScoring && hasNextQuestion && (gameMasterData.question_state === "ANSWER" || !gameMasterData.question_state) &&
             <button
               className="Button"
               onClick={() => actions.ask_next_question()}
