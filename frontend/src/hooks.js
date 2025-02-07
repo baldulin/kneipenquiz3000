@@ -3,6 +3,20 @@ import {hostName} from "./config";
 
 const localStorageKey = "quizKey";
 
+
+export const fetchEndpoint = (uri, options) => (
+    fetch(`${hostName}${uri}`, options).catch((error) => {
+      console.log("GOt Error", error);
+    }).then((response) => {
+
+      if(response.status === 401){
+        throw response;
+      }
+      response.json()
+    })
+
+);
+
 export const useLocalStorage = (initialState) => {
   const [state, setStateInner] = useState(() => initialState ?? JSON.parse(window.localStorage.getItem(localStorageKey)));
 
@@ -50,8 +64,7 @@ export const useRemoteState = (defaultState) => {
     let gameName = "Test";
 
     const func = () => {
-      console.log("Get Info");
-      fetch(`${hostName}/api/${gameName}/`).then((response) => response.json()).then(
+      fetchEndpoint(`/api/${gameName}/`).then(
         (data) => {
           console.log(data);
           setState((oldData) => ({...oldData, newState: data}));
@@ -79,7 +92,7 @@ export const useScreen = () => {
     const timeout = 1000;
     let running = true;
     const func = () => {
-        fetch(`${hostName}/api/${gameName}/`).then((response) => response.json()).then(
+        fetchEndpoint(`/api/${gameName}/`).then(
         (data) => {
           setState(data);
           if(running){
@@ -102,10 +115,10 @@ export const useTeam = (gameName, name) => {
 
   useEffect(() => {
     if(name?.length > 0){
-      fetch(`${hostName}/api/${gameName}/join_team`, {
+      fetchEndpoint(`/api/${gameName}/join_team`, {
         method: "PUT",
         body: JSON.stringify({"name": name}),
-      }).then((response) => response.json()).then(
+      }).then(
         (data) => {
           setLocalStorage({"teamToken": data});
         }
@@ -120,9 +133,12 @@ export const useTeam = (gameName, name) => {
     let timeout = 1000;
     let running = true;
     const func = () => {
-      fetch(`${hostName}/api/${gameName}/team`, {
+      fetchEndpoint(`/api/${gameName}/team`, {
         headers: {"Authorization": `Bearer ${teamToken}`},
-      }).then((response) => response.json()).then(
+      }).catch((response) => {
+        setTeamData(null);
+        setLocalStorage((data) => ({...data, teamToken: undefined}));
+      }).then(
         (data) => {
           setTeamData(data);
           if(running){
@@ -139,7 +155,7 @@ export const useTeam = (gameName, name) => {
   const sendAction = (action) => (
     (data) => {
       console.log("action", data);
-      fetch(`${hostName}/api/${gameName}/team/${action}`, {
+      fetchEndpoint(`/api/${gameName}/team/${action}`, {
         headers: {"Authorization": `Bearer ${teamToken}`},
         method: "PUT",
         body: JSON.stringify(data),
@@ -161,7 +177,7 @@ export const useGameMaster = (password) => {
   let gameName = "Test";
   useEffect(() => {
     if(password?.length > 4){
-      fetch(`${hostName}/api/${gameName}/join_gamemaster`, {
+      fetchEndpoint(`/api/${gameName}/join_gamemaster`, {
         method: "PUT",
         body: JSON.stringify(password),
       }).then((response) => {
@@ -185,7 +201,7 @@ export const useGameMaster = (password) => {
     let gameName = "Test";
     let running = true;
     const func = () => {
-      fetch(`${hostName}/api/${gameName}/gamemaster`, {
+      fetchEndpoint(`/api/${gameName}/gamemaster`, {
         headers: {"Authorization": `Bearer ${gameMasterToken}`},
       }).then((response) => response.json()).then(
         (data) => {
@@ -203,7 +219,7 @@ export const useGameMaster = (password) => {
 
   const sendAction = (action) => (
     (data) => (
-      fetch(`${hostName}/api/${gameName}/gamemaster/${action}`, {
+      fetchEndpoint(`${hostName}/api/${gameName}/gamemaster/${action}`, {
         headers: {"Authorization": `Bearer ${gameMasterToken}`},
         method: "PUT",
         body: JSON.stringify(data),
