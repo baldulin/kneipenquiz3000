@@ -7,15 +7,24 @@ const localStorageKey = "quizKey";
 export const fetchEndpoint = (uri, options) => (
     fetch(`${hostName}${uri}`, options).catch((error) => {
       console.log("GOt Error", error);
-    }).then((response) => {
+    }).then(async (response) => {
+      if(!response){
+        throw {
+          error: "Server not available",
+        };
+      }
 
       if(response.status === 401){
         throw response;
       }
+      else if(response.status === 422){
+        // TODO weird construction but yeah okay
+        throw await response.json()
+      }
+
       // TODO add more status codes here
       return response.json()
     })
-
 );
 
 export const useLocalStorage = (initialState) => {
@@ -119,6 +128,8 @@ export const useTeam = (gameName, name) => {
       fetchEndpoint(`/api/${gameName}/join_team`, {
         method: "PUT",
         body: JSON.stringify({"name": name}),
+      }).catch((response) => {
+        setTeamData(response);
       }).then(
         (data) => {
           setLocalStorage({"teamToken": data});

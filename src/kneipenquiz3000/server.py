@@ -4,7 +4,7 @@ import secrets
 import re
 from aiohttp import web
 from enum import Enum
-from .states import Game, ScreenStates, Team, Gamemaster, QuestionStates
+from .states import Game, ScreenStates, Team, Gamemaster, QuestionStates, TeamAlreadyExistsException
 from .logs import logger
 from .exceptions import WrongPasswordException
 
@@ -120,6 +120,13 @@ def get_secret():
     return base64.b64encode(secrets.token_bytes(32)).decode("utf8")
 
 
+def _get_exception_message(e):
+    try:
+        return e.args[0]
+    except:
+        return None
+
+
 @routes.put("/api/{game_name}/join_team")
 async def join_team(request):
     game = get_game(request)
@@ -130,7 +137,14 @@ async def join_team(request):
     session_key = get_secret()
 
     team = Team(address, name, session_key)
-    game.join_team(team)
+    try:
+        game.join_team(team)
+    except TeamAlreadyExistsException as e:
+        logger.debug("Another Team %s failed to join game %s from %s", name, game.name, request.remote)
+        return json_response({
+            "errorType": type(e).__name__,
+            "error": _get_exception_message(e),
+        }, status=422)
 
     response = json_response(session_key)
     response.set_cookie("team", session_key)

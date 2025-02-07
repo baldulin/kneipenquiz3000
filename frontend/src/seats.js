@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useCallback} from "react";
 import {useTeam, useGameMaster, useScreen} from "./hooks";
 import {BaseTeamRenderer, QuestionRenderer} from "./renderer";
 
@@ -130,14 +130,24 @@ export const TeamSeat = () => {
   const [preName, setPreName] = useState("");
   const [name, setName] = useState("");
   const [state, actions] = useTeam(gameName, name)
+  const enterHandler = useCallback((e) => {
+    if(e.key === "Enter"){
+      // TODO use form submit
+      setName(e.target.value);
+    }
+  });
 
-  if(!state){
+  // TODO clicking submit doesn't really do anything if the value already was set last time
+  if(!state || !!state.error){
     return <div className="App Login">
+      {state?.error && <div className="Error">
+        {state?.error}
+      </div>}
       <div className="Title">Kneipenquiz</div>
       <div className="Wrapper">
      <div className="Title">Team Name:</div>
       <div className="Password">
-        <input type="text" value={preName} onChange={(ev) => setPreName(ev.target.value)}/>
+        <input type="text" value={preName} onChange={(ev) => setPreName(ev.target.value)} onKeyUp={enterHandler} />
       </div>
       <input type="button" onClick={() => setName(preName)} value="Start!"/>
       </div>

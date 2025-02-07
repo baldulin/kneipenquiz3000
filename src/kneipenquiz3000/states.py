@@ -27,6 +27,14 @@ QuestionStates = Enum("QuestionStates", ("ASK", "SCORE", "ANSWER"))
 ScreenStates = Enum("ScreenStates", ("SETUP", "LOBBY", "QUESTION", "ANSWER", "SCORE", "FINAL"))
 
 
+class GameException(Exception):
+    pass
+
+
+class TeamAlreadyExistsException(GameException):
+    pass
+
+
 class Scorer:
     def __init__(self):
         self.default_score = 0
@@ -404,7 +412,7 @@ class Game:
     def join_team(self, team):
         for t in self.teams:
             if t.name == team.name:
-                raise Exception("Team already exists")
+                raise TeamAlreadyExistsException(f"Team with name \"{team.name}\" already exists")
         self.scorer.init_score([team])
         self.teams.append(team)
 
