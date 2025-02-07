@@ -32,6 +32,10 @@ class GameException(Exception):
     pass
 
 
+class NoMoreQuestionsException(GameException):
+    pass
+
+
 class TeamAlreadyExistsException(GameException):
     pass
 
@@ -134,7 +138,7 @@ class Quiz:
 
         # TODO skip empty blocks?
         if len(self.blocks) <= block_index + 1:
-            raise Exception("No more questions")
+            raise NoMoreQuestionsException("No more questions")
 
         block_index += 1
         if len(self.blocks[block_index]) > 0:

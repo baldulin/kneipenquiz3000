@@ -4,7 +4,7 @@ import secrets
 import re
 from aiohttp import web
 from enum import Enum
-from .states import Game, ScreenStates, Team, Gamemaster, QuestionStates, TeamAlreadyExistsException
+from .states import Game, ScreenStates, Team, Gamemaster, QuestionStates, TeamAlreadyExistsException, NoMoreQuestionsException
 from .logs import logger
 from .exceptions import WrongPasswordException
 
@@ -261,7 +261,10 @@ async def game_action(request):
     elif action == "show_answer":
         game.show_answer(data)
     elif action == "ask_next_question":
-        game.ask_next_question()
+        try:
+            game.ask_next_question()
+        except NoMoreQuestionsException:
+            return json_response({"error": "No More questions"}, status=422)
     elif action == "set_screen_state":
         screen_state = ScreenStates[data]
         game.set_screen_state(screen_state)
