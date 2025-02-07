@@ -65,35 +65,6 @@ export const useLocalStorage = (initialState) => {
 };
 
 
-export const useRemoteState = (defaultState) => {
-  let [state, setState] = useState(defaultState);
-
-  useEffect(() => {
-    let running = true;
-    let pollingInterval = 5000;
-    let gameName = "Test";
-
-    const func = () => {
-      fetchEndpoint(`/api/${gameName}/`).then(
-        (data) => {
-          console.log(data);
-          setState((oldData) => ({...oldData, newState: data}));
-        }
-      );
-
-      if(running){
-        setTimeout(func, pollingInterval);
-      }
-    };
-
-    func();
-    return () => running = false; 
-  }, []);
-
-  return [state, setState]
-}
-
-
 export const useScreen = () => {
   const [state, setState] = useState(null);
 
@@ -213,6 +184,7 @@ export const useGameMaster = (password) => {
       }).then(
         (data) => {
           setQuizData(data);
+
           if(running){
             setTimeout(func, refreshTimeout);
           }
