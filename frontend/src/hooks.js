@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import {hostName} from "./config";
+import {hostName, refreshTimeout} from "./config";
 
 const localStorageKey = "quizKey";
 
@@ -99,14 +99,13 @@ export const useScreen = () => {
 
   let gameName = "Test";
   useEffect(() => {
-    const timeout = 1000;
     let running = true;
     const func = () => {
         fetchEndpoint(`/api/${gameName}/`).then(
         (data) => {
           setState(data);
           if(running){
-            setTimeout(func, timeout);
+            setTimeout(func, refreshTimeout);
           }
         }
       );
@@ -142,7 +141,6 @@ export const useTeam = (gameName, name) => {
     if(!teamToken){
       return;
     }
-    let timeout = 1000;
     let running = true;
     const func = () => {
       fetchEndpoint(`/api/${gameName}/team`, {
@@ -154,7 +152,7 @@ export const useTeam = (gameName, name) => {
         (data) => {
           setTeamData(data);
           if(running){
-            setTimeout(func, timeout);
+            setTimeout(func, refreshTimeout);
           }
         }
       );
@@ -192,16 +190,13 @@ export const useGameMaster = (password) => {
       fetchEndpoint(`/api/${gameName}/join_gamemaster`, {
         method: "PUT",
         body: JSON.stringify(password),
-      }).then((response) => {
-        if(response.status !== 200){
-          return null;
-        }
-        return response.json();
-      }).then(
-        (data) => {
-          setGameMasterToken(data);
-        }
-      );
+      }).then((data) => {
+          if(data){
+            setGameMasterToken(data);
+          }
+      }).catch((e) => {
+        console.log("Unauthorized", e);
+      });
     }
   }, [password]);
 
@@ -215,14 +210,16 @@ export const useGameMaster = (password) => {
     const func = () => {
       fetchEndpoint(`/api/${gameName}/gamemaster`, {
         headers: {"Authorization": `Bearer ${gameMasterToken}`},
-      }).then((response) => response.json()).then(
+      }).then(
         (data) => {
           setQuizData(data);
           if(running){
-            setTimeout(func, 3000);
+            setTimeout(func, refreshTimeout);
           }
         }
-      );
+      ).catch((response) => {
+          setGameMasterToken(null);
+      });
     };
     func();
 
@@ -231,7 +228,7 @@ export const useGameMaster = (password) => {
 
   const sendAction = (action) => (
     (data) => (
-      fetchEndpoint(`${hostName}/api/${gameName}/gamemaster/${action}`, {
+      fetchEndpoint(`/api/${gameName}/gamemaster/${action}`, {
         headers: {"Authorization": `Bearer ${gameMasterToken}`},
         method: "PUT",
         body: JSON.stringify(data),
