@@ -12,7 +12,8 @@ export const fetchEndpoint = (uri, options) => (
       if(response.status === 401){
         throw response;
       }
-      response.json()
+      // TODO add more status codes here
+      return response.json()
     })
 
 );
