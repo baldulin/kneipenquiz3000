@@ -39,8 +39,9 @@ export const GameMasterSeat = () => {
   const quiz = state?.questions;
   const blockIndex = state?.current_question_index?.[0];
 
-  if(!state){
+  if(!state || !!state.error){
     return <div className="App">
+      {!!state?.error && <div className="Error">{state.error}</div>}
       <input type="password" value={password} onChange={(ev) => setPassword(ev.target.value)}/>
     </div>
   }

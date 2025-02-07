@@ -257,7 +257,7 @@ async def game_action(request):
     elif action == "show_question":
         game.show_question(await request.json())
     elif action == "score_answer":
-        game.score_answer()
+        result = game.score_answer()
     elif action == "show_answer":
         game.show_answer(data)
     elif action == "ask_next_question":

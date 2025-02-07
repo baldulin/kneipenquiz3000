@@ -231,7 +231,6 @@ export const BaseActions = ({ state, actions, questionIndex, blockIndex, isCurre
 
 export const ItemAnswerRenderer = ({gameMasterData, answer}) => {
   const renderer = gameMasterData?.question_data?.renderer;
-  console.log("RENDERERE", renderer, answer);
   if(renderer === "guess"){
     return answer;
   }
@@ -260,7 +259,7 @@ export const BaseTeamRenderer = ({gameMasterData, actions}) => {
   }
 
   useEffect(() => {
-    setScores(gameMasterData.score_data); 
+    setScores(gameMasterData.current_answer_score_data);
   }, [isScoring]);
 
   return <div className="Game">
@@ -314,7 +313,8 @@ export const BaseTeamRenderer = ({gameMasterData, actions}) => {
               {isScoring
                 ? <input
                     type="text"
-                    value={scores[team]}
+                    value={scores?.[team]}
+                    autocomplete="off"
                     onChange={(ev) => setScores((oldState) => ({...oldState, [team]: ev.target.value}))}
                   />
                 : ""

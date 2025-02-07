@@ -20,6 +20,7 @@ from enum import Enum
 from pprint import pprint
 from .logs import logger
 from .exceptions import WrongPasswordException
+from random import shuffle
 
 
 GameStates = Enum("GameState", ("INIT", "PLAY", "END"))
@@ -52,7 +53,7 @@ class Scorer:
                 if guess is not None and not isinstance(guess, int):
                     raise TypeError(f"Answer must be of type (int, None) not {guess}")
                 answer = question.answers[guess]
-                team.current_answer_score = 1 if answer.kwargs.get("correct", False) else 0
+                team.current_answer_score = 1 if answer.correct else 0
         elif question.renderer == "guess":
             max_guess_score = 4
             answer = float(question.answers[0].kwargs["text"])
@@ -86,7 +87,10 @@ class Team:
         self.current_emotion = emotion
 
     def reward(self, reward):
-        self.current_score += int(reward)
+        try:
+            self.current_score += int(reward) if reward is not None else 0
+        except TypeError:
+            logger.debug(f"Could not parse int for reward \"{reward}\" of type {type(reward)} in team \"{self.name}\"")
         self.current_answer_score = 0
 
     def reset_answer(self):
@@ -190,11 +194,10 @@ class QuestionBlock:
 
 
 class Question:
-    def __init__(self, title, renderer, answers, correct=None):
+    def __init__(self, title, renderer, answers):
         self.title = title
         self.renderer = renderer
         self.answers = answers
-        self.correct = correct
 
     def __str__(self):
         return f"Question({self.title})"
@@ -204,9 +207,8 @@ class Question:
         title = data["title"]
         renderer = data["renderer"]
         answers = [Answer(**answer) for answer in data.get("answers", [])]
-        correct = data.get("correct")
 
-        return Question(title, renderer, answers, correct)
+        return Question(title, renderer, answers)
 
     def to_json(self):
         return {
@@ -220,12 +222,15 @@ class Question:
             "title": self.title,
             "renderer": self.renderer,
             "answers": [answer.to_answer_json() for answer in self.answers],
-            "correct": self.correct,
         }
+
+    def shuffle(self):
+        shuffle(self.answers)
 
 
 class Answer:
-    def __init__(self, **kwargs):
+    def __init__(self, correct=False, **kwargs):
+        self.correct = correct
         self.kwargs = kwargs
 
     def __str__(self):
@@ -235,7 +240,7 @@ class Answer:
         return self.kwargs
 
     def to_answer_json(self):
-        return self.kwargs
+        return {**self.kwargs, "correct": self.correct}
 
 
 class Game:
@@ -294,16 +299,19 @@ class Game:
 
     @property
     def gamemaster_data(self):
+        question_data = self.current_question.to_answer_json() if self.current_question else None
         guess_data = {team.name: team.current_answer for team in self.teams}
+
         keys = ["key", "active", "team_count", "game_state", "title", "name",
             "question_count", "current_question_index", "question_state", "screen_state",
-            "question_data", "guess_data", "emotion_data", "score_data", "current_answer_score_data",
+            "guess_data", "emotion_data", "score_data", "current_answer_score_data",
         ]
         kwargs = {key: getattr(self, key) for key in keys}
 
         return {
             **kwargs,
             "questions": self.questions.to_answer_json(),
+            "question_data": question_data,
             "score_data": self.score_data,
             "emotion_data": self.emotion_data,
             "guess_data": guess_data,
@@ -369,6 +377,9 @@ class Game:
         for team in self.teams:
             team.reset_answer()
 
+        # Shuffle question
+        self.current_question.shuffle()
+
     def show_question(self, index):
         self.current_question_index = index
 
@@ -384,7 +395,7 @@ class Game:
         self.question_state = QuestionStates.SCORE
 
         # Do the scoring
-        self.scorer.score(self.current_question, self.teams)
+        return self.scorer.score(self.current_question, self.teams)
 
     def show_answer(self, scores=None):
         if self.current_question is None:
