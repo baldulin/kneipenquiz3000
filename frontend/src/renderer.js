@@ -36,7 +36,8 @@ export const TeamBaseRenderer = ({ title, answers, state, actions, currentAnswer
 // TODO here the input lag of server and return makes currentAnswer weird!
 // currently its decoupled but maybe I need to couple it
 export const TeamGuessRenderer = ({ title, answers, state, actions, currentAnswer}) => {
-  const { letter, text } = answers[0];
+  const letter = answers?.[0]?.letter;
+  const text = answers?.[0]?.text;
 
   return (
     <div className="Question Guess">

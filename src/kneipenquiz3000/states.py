@@ -215,6 +215,12 @@ class Question:
         return Question(title, renderer, answers)
 
     def to_json(self):
+        if self.renderer == "guess":
+            return {
+                "title": self.title,
+                "renderer": self.renderer,
+                "answers": [],
+            }
         return {
             "title": self.title,
             "renderer": self.renderer,
