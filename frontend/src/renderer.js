@@ -35,7 +35,8 @@ export const TeamBaseRenderer = ({ title, answers, state, actions, currentAnswer
 
 // TODO here the input lag of server and return makes currentAnswer weird!
 // currently its decoupled but maybe I need to couple it
-export const TeamGuessRenderer = ({ title, answers, state, actions, currentAnswer}) => {
+export const TeamGuessRenderer = ({ title, answers, state, actions, currentAnswer, min, max, start}) => {
+  const [value, setValue] = useState(start);
   const letter = answers?.[0]?.letter;
   const text = answers?.[0]?.text;
 
@@ -59,7 +60,8 @@ export const TeamGuessRenderer = ({ title, answers, state, actions, currentAnswe
             </div>
             ) : (
             <div className="Answer">
-              <input type="text" onChange={(ev) => actions.guess(ev.target.value)}/>
+              <input type="text" value={value} disabled/>
+              <input type="range" min={min} max={max} value={value} onChange={(ev) => {setValue(ev.target.value); actions.guess(ev.target.value);}}/>
             </div>
         )}
       </div>

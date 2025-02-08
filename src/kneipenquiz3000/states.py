@@ -198,10 +198,13 @@ class QuestionBlock:
 
 
 class Question:
-    def __init__(self, title, renderer, answers):
+    def __init__(self, title, renderer, answers, guess_min=None, guess_max=None, guess_start=None):
         self.title = title
         self.renderer = renderer
         self.answers = answers
+        self.guess_min = guess_min
+        self.guess_max = guess_max
+        self.guess_start = guess_start
 
     def __str__(self):
         return f"Question({self.title})"
@@ -210,8 +213,16 @@ class Question:
     def from_json(cls, data):
         title = data["title"]
         renderer = data["renderer"]
+
         answers = [Answer(**answer) for answer in data.get("answers", [])]
 
+        if renderer == "guess":
+            return Question(
+                title, renderer, answers,
+                guess_min=data.get("guess_min", 0),
+                guess_max=data.get("guess_max", 10000),
+                guess_start=data.get("guess_start", 0)
+            )
         return Question(title, renderer, answers)
 
     def to_json(self):
@@ -219,6 +230,9 @@ class Question:
             return {
                 "title": self.title,
                 "renderer": self.renderer,
+                "min": self.guess_min,
+                "max": self.guess_max,
+                "start": self.guess_start,
                 "answers": [],
             }
         return {
