@@ -1,6 +1,54 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {hostName, refreshTimeout} from "./config";
 
+
+const mergeState = (oldState, newState) => {
+  if(newState === undefined || newState === null || Number.isNaN(newState)){
+    return newState;
+  }
+
+  if(Array.isArray(newState)){
+    if(!Array.isArray(oldState)){
+      return newState;
+    }
+
+    const result = newState.map((value, index) => mergeState(oldState[index], value))
+    if(result.length !== oldState.length || result.some((value, index) => value != oldState[index])){
+      const index = result.findIndex((value, index) => value != oldState[index]);
+      return result;
+    }
+    return oldState;
+  }
+
+  if(typeof newState === "object"){
+    if(typeof oldState !== "object" || oldState === null || oldState === undefined){
+      return newState;
+    }
+
+    const result = Object.fromEntries(Object.entries(newState).map(([key, value]) => [key, mergeState(oldState[key], value)]));
+
+    if(Object.keys(oldState).length !== Object.keys(result).length || Object.entries(result).some(([key, value]) => value != oldState[key])){
+      return result;
+    }
+    return oldState;
+  }
+
+  return newState;
+}
+
+
+export const useMergedState = (initialState) => {
+  const [state, setState] = useState(initialState);
+  const setMergedState = useCallback((update) => {
+    if(typeof update === "function"){
+      setState((data) => mergeState(data, update(data)));
+    }
+    setState((data) => mergeState(data, update));
+  });
+  return [state, setMergedState]
+};
+
+
 const localStorageKey = "quizKey";
 
 
@@ -89,7 +137,7 @@ export const useScreen = () => {
 
 
 export const useTeam = (gameName, name) => {
-  const [teamData, setTeamData] = useState(null);
+  const [teamData, setTeamData] = useMergedState(null);
   const [localStorage, setLocalStorage] = useLocalStorage();
   const teamToken = localStorage?.teamToken;
 
@@ -153,7 +201,7 @@ export const useTeam = (gameName, name) => {
 
 export const useGameMaster = (password) => {
   const [gameMasterToken, setGameMasterToken] = useState(null);
-  const [quizData, setQuizData] = useState(null);
+  const [quizData, setQuizData] = useMergedState(null);
 
   let gameName = "Test";
   useEffect(() => {
